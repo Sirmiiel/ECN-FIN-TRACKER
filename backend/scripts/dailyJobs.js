@@ -155,4 +155,4 @@ if (require.main === module) {
     });
 }
 
-module.exports = { reconcileBalances, notifyLongPendingPayments, generateDailySummary };
+module.exports = { reconcileBalances, notifyLongPendingPayments, generateDailySummary, runDailyJobs };
