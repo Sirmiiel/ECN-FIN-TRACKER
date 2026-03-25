@@ -1,5 +1,6 @@
 import React, { useState, useEffect, useCallback, useRef } from 'react';
 import { paymentAPI } from '../services/api';
+import { formatCurrency } from '../utils/currency';
 
 const PAYMENT_METHODS = [
   { value: '', label: 'Select method' },
@@ -114,13 +115,13 @@ function AllocationPreview({ preview }) {
       {remainderUnallocated > 0 && (
         <div style={{ background: 'rgba(239,68,68,0.1)', border: '1px solid rgba(239,68,68,0.3)', borderRadius: 8, padding: '10px 14px' }}>
           <span style={{ color: '#fca5a5', fontFamily: 'monospace', fontSize: 12 }}>
-            ⚠ ${remainderUnallocated.toFixed(2)} exceeds remaining campaign periods — held as balance surplus.
+            ⚠ {formatCurrency(remainderUnallocated)} exceeds remaining campaign periods — held as balance surplus.
           </span>
         </div>
       )}
 
       <div style={{ marginTop: 14, paddingTop: 14, borderTop: '1px solid rgba(255,255,255,0.06)', display: 'flex', justifyContent: 'space-between', fontFamily: 'monospace', fontSize: 11, color: '#475569' }}>
-        <span>Daily rate: ${ratePerPeriod.toLocaleString()}</span>
+        <span>Rate: {formatCurrency(ratePerPeriod)}</span>
         <span>Fully covered: {slots.filter(s => s.fullyCovered).length} period(s)</span>
       </div>
     </div>
@@ -161,7 +162,9 @@ export default function SubmitPayment({ onSuccess }) {
     if (!confirmed) { setError('Confirm the allocation before submitting.'); return; }
     setError(''); setSuccess(''); setSubmitting(true);
     try {
-      const key = `${Date.now()}-${Math.random().toString(36).slice(2)}`;
+      const key = typeof crypto !== 'undefined' && crypto.randomUUID
+        ? crypto.randomUUID()
+        : `${Date.now()}-${Math.random().toString(36).slice(2)}`;
       await paymentAPI.submit(parseFloat(amount), method, key);
       setSuccess('✓ Payment submitted and queued for verification.');
       setAmount(''); setMethod(''); setPreview(null); setConfirmed(false);
@@ -197,9 +200,9 @@ export default function SubmitPayment({ onSuccess }) {
 
           {/* Amount */}
           <div style={{ marginBottom: 18 }}>
-            <label style={{ display: 'block', fontFamily: 'monospace', fontSize: 11, color: '#64748b', letterSpacing: '0.12em', textTransform: 'uppercase', marginBottom: 8 }}>Amount ($)</label>
+            <label style={{ display: 'block', fontFamily: 'monospace', fontSize: 11, color: '#64748b', letterSpacing: '0.12em', textTransform: 'uppercase', marginBottom: 8 }}>Amount (NGN)</label>
             <div style={{ position: 'relative' }}>
-              <span style={{ position: 'absolute', left: 16, top: '50%', transform: 'translateY(-50%)', color: '#475569', fontSize: 16, fontFamily: 'monospace' }}>$</span>
+              <span style={{ position: 'absolute', left: 16, top: '50%', transform: 'translateY(-50%)', color: '#475569', fontSize: 16, fontFamily: 'monospace' }}>₦</span>
               <input
                 type="number" step="0.01" min="0.01" value={amount}
                 onChange={e => setAmount(e.target.value)}
@@ -235,7 +238,7 @@ export default function SubmitPayment({ onSuccess }) {
                 {confirmed && <span style={{ color: '#000', fontSize: 13, fontWeight: 800 }}>✓</span>}
               </div>
               <span style={{ color: '#94a3b8', fontFamily: 'monospace', fontSize: 13, lineHeight: 1.5 }}>
-                I confirm this allocation for <strong style={{ color: '#f1f5f9' }}>${parseFloat(amount||0).toFixed(2)}</strong>
+                I confirm this allocation for <strong style={{ color: '#f1f5f9' }}>{formatCurrency(amount || 0)}</strong>
               </span>
             </div>
           )}

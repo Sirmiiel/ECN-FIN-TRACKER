@@ -47,7 +47,7 @@ export default function BankAccountCard({ bankAccount }) {
       <div style={{ display: 'grid', gridTemplateColumns: '1fr 1fr', gap: 16, marginBottom: 20 }}>
         {[
           { label: 'Account Number', value: revealed ? fmt(accountNumber) : mask(accountNumber) },
-          { label: 'Currency', value: currency || 'USD' },
+          { label: 'Currency', value: currency || 'NGN' },
           { label: 'IBAN', value: revealed ? fmt(iban) : (iban ? `${iban.slice(0,4)}···${iban.slice(-6)}` : '—') },
           { label: 'Sort Code', value: revealed ? fmt(sortCode) : (sortCode ? '··-··-··' : '—') },
         ].map(({ label, value }) => (

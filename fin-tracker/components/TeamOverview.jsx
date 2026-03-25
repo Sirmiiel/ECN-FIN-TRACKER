@@ -1,5 +1,6 @@
 import React, { useState, useEffect } from 'react';
 import { dashboardAPI } from '../services/api';
+import { formatCurrency } from '../utils/currency';
 
 export default function TeamOverview() {
   const [teamData, setTeamData] = useState(null);
@@ -60,7 +61,7 @@ export default function TeamOverview() {
         </div>
         <div className="card">
           <h3 className="text-sm font-medium text-gray-600 mb-2">Total Balance</h3>
-          <p className="text-3xl font-bold text-green-600">${totals.totalBalance.toFixed(2)}</p>
+          <p className="text-3xl font-bold text-green-600">{formatCurrency(totals.totalBalance)}</p>
         </div>
         <div className="card">
           <h3 className="text-sm font-medium text-gray-600 mb-2">Daily Plan</h3>
@@ -127,7 +128,7 @@ export default function TeamOverview() {
                     {user.uniqueUserId}
                   </td>
                   <td className="px-4 py-3 text-sm font-semibold text-green-600">
-                    ${user.balance.toFixed(2)}
+                    {formatCurrency(user.balance)}
                   </td>
                   <td className="px-4 py-3 text-sm">
                     <span className={`badge ${

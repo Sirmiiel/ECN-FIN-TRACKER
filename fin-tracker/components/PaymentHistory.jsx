@@ -1,6 +1,7 @@
 import React, { useState, useEffect } from 'react';
 import { paymentAPI } from '../services/api';
 import { format } from 'date-fns';
+import { formatCurrency } from '../utils/currency';
 
 export default function PaymentHistory() {
   const [payments, setPayments] = useState([]);
@@ -91,7 +92,7 @@ export default function PaymentHistory() {
                       {format(new Date(payment.payment_date), 'MMM dd, yyyy HH:mm')}
                     </td>
                     <td className="px-4 py-3 text-sm font-semibold text-gray-900">
-                      ${parseFloat(payment.amount).toFixed(2)}
+                      {formatCurrency(payment.amount)}
                     </td>
                     <td className="px-4 py-3 text-sm text-gray-600">
                       {payment.payment_method || '-'}

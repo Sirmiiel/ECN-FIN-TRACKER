@@ -1,9 +1,10 @@
 import React, { useState, useEffect } from 'react';
 import { useAuth } from '../contexts/AuthContext';
-import { dashboardAPI } from '../services/api';
+import { authAPI, dashboardAPI } from '../services/api';
 import { format } from 'date-fns';
 import BankAccountCard from './BankAccountCard';
 import ContributionCalendar from './ContributionCalendar';
+import { formatCurrency } from '../utils/currency';
 
 const statusBadge = (status) => {
   const map = {
@@ -33,7 +34,7 @@ export default function Dashboard() {
         setLoading(true);
         const [dashRes, profileRes] = await Promise.all([
           dashboardAPI.getUserDashboard(),
-          import('../services/api').then(m => m.authAPI.getProfile()),
+          authAPI.getProfile(),
         ]);
         setData(dashRes.data);
         setBankAccount(profileRes.data.bankAccount);
@@ -119,20 +120,20 @@ export default function Dashboard() {
           {[
             {
               label: 'Current Balance',
-              value: `$${u.balance.toLocaleString('en-US', { minimumFractionDigits: 2 })}`,
-              sub: u.targetAmount ? `Target: $${u.targetAmount.toLocaleString()}` : 'No target set',
+              value: formatCurrency(u.balance),
+              sub: u.targetAmount ? `Target: ${formatCurrency(u.targetAmount)}` : 'No target set',
               color: '#34d399', pct: balancePct,
             },
             {
               label: 'Verified Payments',
               value: stats.verifiedPayments,
-              sub: `Total: $${stats.totalVerified.toFixed(2)}`,
+              sub: `Total: ${formatCurrency(stats.totalVerified)}`,
               color: '#38bdf8', pct: null,
             },
             {
               label: 'Plan Track',
               value: `${trackPct}%`,
-              sub: stats.progressPercentage >= 100 ? 'On track ✓' : `$${(stats.expectedAmount - stats.totalVerified).toFixed(0)} behind`,
+              sub: stats.progressPercentage >= 100 ? 'On track ✓' : `${formatCurrency(stats.expectedAmount - stats.totalVerified)} behind`,
               color: stats.progressPercentage >= 100 ? '#34d399' : stats.progressPercentage >= 75 ? '#fbbf24' : '#f87171',
               pct: Math.min(100, stats.progressPercentage),
             },
@@ -201,7 +202,7 @@ export default function Dashboard() {
                                 {format(new Date(p.payment_date), 'dd MMM yyyy, HH:mm')}
                               </td>
                               <td style={{ padding: '12px 12px 12px 0', fontFamily: 'monospace', fontSize: 14, fontWeight: 700, color: '#f1f5f9' }}>
-                                ${parseFloat(p.amount).toFixed(2)}
+                                {formatCurrency(p.amount)}
                               </td>
                               <td style={{ padding: '12px 0' }}>
                                 {statusBadge(p.status)}

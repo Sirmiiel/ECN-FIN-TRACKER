@@ -6,6 +6,7 @@ import SubmitPayment from './SubmitPayment';
 import TeamOverview from './TeamOverview';
 import PaymentHistory from './PaymentHistory';
 import AdminPanel from './AdminPanel';
+import ProfileSettings from './ProfileSettings';
 
 export default function Layout() {
   const { user, logout, isAdmin } = useAuth();
@@ -17,6 +18,7 @@ export default function Layout() {
     { name: 'Submit Payment', href: '/submit', icon: '💰' },
     { name: 'Payment History', href: '/history', icon: '📜' },
     { name: 'Team Overview', href: '/team', icon: '👥' },
+    { name: 'Settings', href: '/settings', icon: '⚙️' },
   ];
 
   if (isAdmin()) {
@@ -130,6 +132,7 @@ export default function Layout() {
           <Route path="/submit" element={<SubmitPayment />} />
           <Route path="/history" element={<PaymentHistory />} />
           <Route path="/team" element={<TeamOverview />} />
+          <Route path="/settings" element={<ProfileSettings />} />
           {isAdmin() && <Route path="/admin" element={<AdminPanel />} />}
           <Route path="*" element={<Navigate to="/dashboard" />} />
         </Routes>

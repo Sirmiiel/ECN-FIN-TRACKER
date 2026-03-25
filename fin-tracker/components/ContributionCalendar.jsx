@@ -1,5 +1,6 @@
 import React, { useState, useEffect } from 'react';
 import { paymentAPI } from '../services/api';
+import { formatCurrency } from '../utils/currency';
 
 // Status config
 const STATUS = {
@@ -17,7 +18,7 @@ function CalendarCell({ slot, onClick }) {
   return (
     <button
       onClick={() => onClick(slot)}
-      title={`Day ${slot.periodNumber} · ${slot.date}\n$${slot.paidAmount.toFixed(2)} / $${slot.required.toFixed(2)}`}
+      title={`Day ${slot.periodNumber} · ${slot.date}\n${formatCurrency(slot.paidAmount)} / ${formatCurrency(slot.required)}`}
       style={{
         width: '100%', aspectRatio: '1', border: `1px solid ${s.border}`,
         borderRadius: 6, background: s.bg, color: s.text,
@@ -56,11 +57,11 @@ function TooltipPanel({ slot, onClose }) {
       <div style={{ color: '#94a3b8', fontFamily: 'monospace', fontSize: 13, marginBottom: 12 }}>{slot.date}</div>
       <div style={{ display: 'flex', justifyContent: 'space-between', marginBottom: 8, fontFamily: 'monospace', fontSize: 13 }}>
         <span style={{ color: '#64748b' }}>Paid</span>
-        <span style={{ color: '#f1f5f9' }}>${slot.paidAmount.toFixed(2)}</span>
+        <span style={{ color: '#f1f5f9' }}>{formatCurrency(slot.paidAmount)}</span>
       </div>
       <div style={{ display: 'flex', justifyContent: 'space-between', marginBottom: 14, fontFamily: 'monospace', fontSize: 13 }}>
         <span style={{ color: '#64748b' }}>Required</span>
-        <span style={{ color: '#f1f5f9' }}>${slot.required.toFixed(2)}</span>
+        <span style={{ color: '#f1f5f9' }}>{formatCurrency(slot.required)}</span>
       </div>
       <div style={{ background: 'rgba(255,255,255,0.07)', borderRadius: 4, height: 6, overflow: 'hidden' }}>
         <div style={{ width: `${percent}%`, height: '100%', background: s.border, borderRadius: 4, transition: 'width 0.4s ease' }} />
@@ -116,7 +117,7 @@ export default function ContributionCalendar({ userId }) {
             Contribution Calendar
           </h2>
           <p style={{ margin: '4px 0 0', color: '#475569', fontFamily: 'monospace', fontSize: 12 }}>
-            {planType === 'daily' ? 'Daily' : 'Weekly'} plan · ${rate.toLocaleString()} per {planType === 'weekly' ? 'week' : 'day'}
+            {planType === 'daily' ? 'Daily' : 'Weekly'} plan · {formatCurrency(rate)} per {planType === 'weekly' ? 'week' : 'day'}
           </p>
         </div>
         <div style={{ display: 'flex', gap: 8, flexWrap: 'wrap' }}>
