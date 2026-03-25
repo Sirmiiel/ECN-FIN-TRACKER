@@ -5,6 +5,7 @@ const rateLimit = require('express-rate-limit');
 const cron = require('node-cron');
 require('dotenv').config();
 
+const logger = require('./config/logger');
 const { pool } = require('./config/database');
 const authRoutes = require('./routes/auth');
 const paymentRoutes = require('./routes/payments');
@@ -40,7 +41,7 @@ app.use(express.urlencoded({ extended: true }));
 
 // Request logging middleware
 app.use((req, res, next) => {
-  console.log(`${new Date().toISOString()} - ${req.method} ${req.path}`);
+  logger.info(`${req.method} ${req.path}`, { ip: req.ip });
   next();
 });
 
@@ -71,7 +72,7 @@ app.use('/api/dashboard', dashboardRoutes);
 
 // Error handling middleware
 app.use((err, req, res, next) => {
-  console.error('Error:', err);
+  logger.error('Unhandled error', { error: err.message, stack: err.stack, path: req.path });
 
   if (err.name === 'ValidationError') {
     return res.status(400).json({ error: err.message });
@@ -96,45 +97,45 @@ app.use((req, res) => {
 if (process.env.NODE_ENV !== 'test') {
   // Daily backup at 2 AM
   cron.schedule('0 2 * * *', async () => {
-    console.log('Running scheduled backup...');
+    logger.info('Running scheduled backup...');
     try {
       await createBackup();
-      console.log('Scheduled backup completed');
+      logger.info('Scheduled backup completed');
     } catch (error) {
-      console.error('Scheduled backup failed:', error);
+      logger.error('Scheduled backup failed', { error: error.message });
     }
   });
 
   // Daily reconciliation at 3 AM
   cron.schedule('0 3 * * *', async () => {
-    console.log('Running daily reconciliation...');
+    logger.info('Running daily reconciliation...');
     try {
       await runDailyJobs();
-      console.log('Daily jobs completed');
+      logger.info('Daily jobs completed');
     } catch (error) {
-      console.error('Daily jobs failed:', error);
+      logger.error('Daily jobs failed', { error: error.message });
     }
   });
 
-  console.log('Scheduled jobs configured');
+  logger.info('Scheduled jobs configured');
 }
 
 // Start server
 app.listen(PORT, () => {
-  console.log(`ECN Tracker API running on port ${PORT}`);
-  console.log(`Environment: ${process.env.NODE_ENV || 'development'}`);
-  console.log(`Health check: http://localhost:${PORT}/health`);
+  logger.info(`ECN Tracker API running on port ${PORT}`);
+  logger.info(`Environment: ${process.env.NODE_ENV || 'development'}`);
+  logger.info(`Health check: http://localhost:${PORT}/health`);
 });
 
 // Graceful shutdown
 process.on('SIGTERM', async () => {
-  console.log('SIGTERM received, shutting down gracefully...');
+  logger.info('SIGTERM received, shutting down gracefully...');
   await pool.end();
   process.exit(0);
 });
 
 process.on('SIGINT', async () => {
-  console.log('SIGINT received, shutting down gracefully...');
+  logger.info('SIGINT received, shutting down gracefully...');
   await pool.end();
   process.exit(0);
 });

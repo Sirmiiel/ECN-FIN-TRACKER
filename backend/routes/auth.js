@@ -6,8 +6,46 @@ const { pool, transaction }      = require('../config/database');
 const { logAction }              = require('../middleware/audit');
 const { authMiddleware, adminMiddleware } = require('../middleware/auth');
 const { createBankAccount }      = require('../services/bankIntegration');
+const logger = require('../config/logger');
 
 const router = express.Router();
+
+// ─── Brute-force protection (in-memory) ──────────────────────────────────────
+const LOGIN_MAX_ATTEMPTS     = parseInt(process.env.LOGIN_MAX_ATTEMPTS || '5');
+const LOGIN_LOCKOUT_MINUTES  = parseInt(process.env.LOGIN_LOCKOUT_MINUTES || '15');
+const loginAttempts = new Map(); // key: uniqueUserId → { count, lastAttempt }
+
+function checkBruteForce(uniqueUserId) {
+  const record = loginAttempts.get(uniqueUserId);
+  if (!record) return { locked: false };
+
+  const elapsed = Date.now() - record.lastAttempt;
+  const lockoutMs = LOGIN_LOCKOUT_MINUTES * 60 * 1000;
+
+  // Lockout expired → reset
+  if (elapsed > lockoutMs) {
+    loginAttempts.delete(uniqueUserId);
+    return { locked: false };
+  }
+
+  if (record.count >= LOGIN_MAX_ATTEMPTS) {
+    const remainingSec = Math.ceil((lockoutMs - elapsed) / 1000);
+    return { locked: true, remainingSec };
+  }
+
+  return { locked: false };
+}
+
+function recordFailedAttempt(uniqueUserId) {
+  const record = loginAttempts.get(uniqueUserId) || { count: 0, lastAttempt: 0 };
+  record.count += 1;
+  record.lastAttempt = Date.now();
+  loginAttempts.set(uniqueUserId, record);
+}
+
+function clearAttempts(uniqueUserId) {
+  loginAttempts.delete(uniqueUserId);
+}
 
 // Register new user (admin only) — auto-creates bank account
 router.post('/register', authMiddleware, adminMiddleware,
@@ -87,21 +125,43 @@ router.post('/login',
     const errors = validationResult(req);
     if (!errors.isEmpty()) return res.status(400).json({ errors: errors.array() });
     const { uniqueUserId, pin } = req.body;
+
+    // Brute-force check
+    const bf = checkBruteForce(uniqueUserId);
+    if (bf.locked) {
+      logger.warn('Login locked out', { uniqueUserId, remainingSec: bf.remainingSec });
+      return res.status(429).json({
+        error: `Too many failed attempts. Try again in ${Math.ceil(bf.remainingSec / 60)} minute(s).`,
+      });
+    }
+
     try {
       const result = await pool.query(
         'SELECT id, name, unique_user_id, pin_hash, role, is_active, bank_account_number, bank_account_status FROM users WHERE unique_user_id = $1',
         [uniqueUserId]
       );
-      if (result.rows.length === 0) return res.status(401).json({ error: 'Invalid credentials' });
+      if (result.rows.length === 0) {
+        recordFailedAttempt(uniqueUserId);
+        return res.status(401).json({ error: 'Invalid credentials' });
+      }
       const user = result.rows[0];
       if (!user.is_active) return res.status(403).json({ error: 'Account is inactive' });
       const validPin = await bcrypt.compare(pin, user.pin_hash);
-      if (!validPin) return res.status(401).json({ error: 'Invalid credentials' });
-      const token = jwt.sign({ userId: user.id, role: user.role }, process.env.JWT_SECRET, { expiresIn: process.env.JWT_EXPIRE });
+      if (!validPin) {
+        recordFailedAttempt(uniqueUserId);
+        logger.warn('Failed login attempt', { uniqueUserId, ip: req.ip });
+        return res.status(401).json({ error: 'Invalid credentials' });
+      }
+
+      // Success — clear any failed attempt history
+      clearAttempts(uniqueUserId);
+
+      const token = jwt.sign({ userId: user.id, role: user.role }, process.env.JWT_SECRET, { expiresIn: process.env.JWT_EXPIRE || '24h' });
       await logAction('USER_LOGIN', user.id, 'user', user.id, {}, req.ip);
+      logger.info('User logged in', { userId: user.id, uniqueUserId });
       res.json({ message: 'Login successful', token, user: { id: user.id, name: user.name, uniqueUserId: user.unique_user_id, role: user.role, bankAccountNumber: user.bank_account_number, bankAccountStatus: user.bank_account_status } });
     } catch (error) {
-      console.error('Login error:', error);
+      logger.error('Login error', { error: error.message });
       res.status(500).json({ error: 'Login failed' });
     }
   }

@@ -1,0 +1,35 @@
+{"level":"info","message":"Scheduled jobs configured","service":"ecn-tracker","timestamp":"2026-03-19 18:35:48"}
+{"level":"info","message":"ECN Tracker API running on port 5001","service":"ecn-tracker","timestamp":"2026-03-19 18:35:48"}
+{"level":"info","message":"Environment: development","service":"ecn-tracker","timestamp":"2026-03-19 18:35:48"}
+{"level":"info","message":"Health check: http://localhost:5001/health","service":"ecn-tracker","timestamp":"2026-03-19 18:35:48"}
+{"level":"info","message":"Scheduled jobs configured","service":"ecn-tracker","timestamp":"2026-03-19 18:36:39"}
+{"level":"info","message":"ECN Tracker API running on port 5001","service":"ecn-tracker","timestamp":"2026-03-19 18:36:39"}
+{"level":"info","message":"Environment: development","service":"ecn-tracker","timestamp":"2026-03-19 18:36:39"}
+{"level":"info","message":"Health check: http://localhost:5001/health","service":"ecn-tracker","timestamp":"2026-03-19 18:36:39"}
+{"level":"info","message":"Scheduled jobs configured","service":"ecn-tracker","timestamp":"2026-03-19 18:38:18"}
+{"level":"info","message":"ECN Tracker API running on port 5001","service":"ecn-tracker","timestamp":"2026-03-19 18:38:18"}
+{"level":"info","message":"Environment: development","service":"ecn-tracker","timestamp":"2026-03-19 18:38:18"}
+{"level":"info","message":"Health check: http://localhost:5001/health","service":"ecn-tracker","timestamp":"2026-03-19 18:38:18"}
+{"ip":"::1","level":"info","message":"GET /health","service":"ecn-tracker","timestamp":"2026-03-19 18:38:47"}
+{"ip":"::1","level":"info","message":"POST /api/auth/login","service":"ecn-tracker","timestamp":"2026-03-19 18:39:05"}
+{"level":"info","message":"User logged in","service":"ecn-tracker","timestamp":"2026-03-19 18:39:05","uniqueUserId":"admin","userId":1}
+{"ip":"::1","level":"info","message":"POST /api/auth/register","service":"ecn-tracker","timestamp":"2026-03-19 18:39:36"}
+{"ip":"::1","level":"info","message":"POST /api/auth/login","service":"ecn-tracker","timestamp":"2026-03-19 18:39:51"}
+{"ip":"::1","level":"info","message":"POST /api/auth/login","service":"ecn-tracker","timestamp":"2026-03-19 18:39:51"}
+{"ip":"::1","level":"info","message":"POST /api/auth/login","service":"ecn-tracker","timestamp":"2026-03-19 18:39:51"}
+{"ip":"::1","level":"info","message":"POST /api/auth/login","service":"ecn-tracker","timestamp":"2026-03-19 18:39:51"}
+{"ip":"::1","level":"info","message":"POST /api/auth/login","service":"ecn-tracker","timestamp":"2026-03-19 18:39:51"}
+{"ip":"::1","level":"info","message":"POST /api/auth/login","service":"ecn-tracker","timestamp":"2026-03-19 18:39:51"}
+{"level":"warn","message":"Login locked out","remainingSec":900,"service":"ecn-tracker","timestamp":"2026-03-19 18:39:51","uniqueUserId":"brutetest"}
+{"ip":"::1","level":"info","message":"POST /api/auth/login","service":"ecn-tracker","timestamp":"2026-03-19 18:43:50"}
+{"level":"warn","message":"Login locked out","remainingSec":661,"service":"ecn-tracker","timestamp":"2026-03-19 18:43:50","uniqueUserId":"brutetest"}
+{"ip":"::1","level":"info","message":"POST /api/auth/login","service":"ecn-tracker","timestamp":"2026-03-19 18:43:50"}
+{"level":"warn","message":"Login locked out","remainingSec":661,"service":"ecn-tracker","timestamp":"2026-03-19 18:43:50","uniqueUserId":"brutetest"}
+{"ip":"::1","level":"info","message":"POST /api/auth/login","service":"ecn-tracker","timestamp":"2026-03-19 18:43:50"}
+{"level":"warn","message":"Login locked out","remainingSec":661,"service":"ecn-tracker","timestamp":"2026-03-19 18:43:50","uniqueUserId":"brutetest"}
+{"ip":"::1","level":"info","message":"POST /api/auth/login","service":"ecn-tracker","timestamp":"2026-03-19 18:43:50"}
+{"level":"warn","message":"Login locked out","remainingSec":661,"service":"ecn-tracker","timestamp":"2026-03-19 18:43:50","uniqueUserId":"brutetest"}
+{"ip":"::1","level":"info","message":"POST /api/auth/login","service":"ecn-tracker","timestamp":"2026-03-19 18:43:50"}
+{"level":"warn","message":"Login locked out","remainingSec":661,"service":"ecn-tracker","timestamp":"2026-03-19 18:43:50","uniqueUserId":"brutetest"}
+{"ip":"::1","level":"info","message":"POST /api/auth/login","service":"ecn-tracker","timestamp":"2026-03-19 18:43:50"}
+{"level":"warn","message":"Login locked out","remainingSec":661,"service":"ecn-tracker","timestamp":"2026-03-19 18:43:50","uniqueUserId":"brutetest"}
